@@ -61,7 +61,7 @@ fs_kernel_module_chk() {
 
 fs_kernel_module=("cramfs" "freevxfs" "hfs" "hfsplus" "jffs2" "squashfs" "udf" "usb-storage")
 
-echo -e "\n\nAudit for file system kernel moudles.\n"
+echo -e "\n\nAudit for file system kernel moudles."
 for module in "${fs_kernel_module[@]}"; do
   fs_kernel_module_chk $module
   echo -e "\n"

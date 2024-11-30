@@ -4,7 +4,7 @@ logvr=-1;
 
 chk_sep_part(){
   if [[ -n $(findmnt -kn $@) && -n $(grep $@ /etc/fstab) ]]; then
-    echo -e "\t- Seperate partion for $@ exists."; logvr=0
+    echo -e "\t- Seperate partion for $@ exists."; logvr=1
   else
     echo -e "\t- Seperate Partion for $@ does not exists."; logvr=0
   fi
@@ -12,7 +12,7 @@ chk_sep_part(){
 
 chk_nodev(){
   if [[ -n $(findmnt -kn $@ | grep nodev) ]]; then
-    echo -e "\t- 'nodev' option is set on $@ partition."; logvr=0
+    echo -e "\t- 'nodev' option is set on $@ partition."; logvr=1
   else 
     echo -e "\t- 'nodev' option is not set on $@ partition."; logvr=0
   fi
@@ -20,9 +20,9 @@ chk_nodev(){
 
 chk_nosuid(){
   if [[ -n $(findmnt -kn $@ | grep nosuid) ]]; then 
-    echo -e "\t- 'nosuid' option is set on $@ partition."; logvr=0 
-  else
-    echo -e "\t- 'nosuid' option is not set on $@ partition."; logvr=0
+    echo -e "\t- 'nosuid' option is set on $@ partition."; logvr=1 
+  else 
+    echo -e "\t- 'nosuid' option is not set on $@ partition."; logvr=0 
   fi
 }
 
