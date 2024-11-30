@@ -51,9 +51,18 @@ lock-rem(){
   i_delay=$(gsettings get org.gnome.desktop.session idle-delay | awk '{ print $2 }')
   logvr=0
 
-  [[ "$l_delay" -le 5 ]] && logvr=1 || gsettings set org.gnome.desktop.screensaver lock-delay 5
+  if [[ "$l_delay" -le 5 ]]; then 
+    logvr=1 
+  else 
+    gsettings set org.gnome.desktop.screensaver lock-delay 5
+  fi
 
-  [[ "$i_delay" -le 900 && "$i_delay" -ne 0 ]] && logvr=1 || gsettings set org.gnome.desktop.session idle-delay 900
+  if [[ "$i_delay" -le 900 && "$i_delay" -ne 0 ]]; then 
+    logvr=1 
+  else 
+    gsettings set org.gnome.desktop.session idle-delay 900
+    logvr=0
+  fi
 
   echo -e "\n- Remediation for GDM screen lock delay:"
   if [[ "$logvr" -eq 0 ]]; then
