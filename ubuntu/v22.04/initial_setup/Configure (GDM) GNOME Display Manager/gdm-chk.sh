@@ -410,18 +410,30 @@ autorun-override-chk() {
   fi
 }
 
-xdcmp-chk(){
+xdmcp-chk(){
+  # while getopts 'n' flag;do 
+  #   case ${flag} in 
+  #     n) set -v; set -n ;;
+  #   esac
+  # done
   lol=$(while IFS= read -r l_file; do
     awk '/\[xdmcp\]/{ f = 1;next } /\[/{ f = 0 } f {if (/^\s*Enable\s*=\s*true/) print "The file: \"'"$l_file"'\" includes: \"" $0 "\" in the \"[xdmcp]\" block"}' "$l_file"
   done < <(grep -Psil -- '^\h*\[xdmcp\]' /etc/{gdm3,gdm}/{custom,daemon}.conf))
 
-  echo -e "\n- Audit for GDM XDCMP option:"
+  echo -e "\n- Audit for GDM XDMCP option:"
   if [[ "$lol" -eq 0 ]]; then
-    echo -e "\t# Audit Result: **PASS** [gdm XDCMP]"
+    echo -e "\t# Audit Result: **PASS** [gdm XDMCP]"
   else 
-    echo -e "\t# Audit Result: **FAIL** [gdm XDCMP]"
+    echo -e "\t# Audit Result: **FAIL** [gdm XDMCP]"
+    echo -e "\t - Reason: $lol"
   fi
 }
+
+# while getopts 'n' flag;do 
+#   case ${flag} in 
+#     n) set -v; set -n ;;
+#   esac
+# done
 
 echo -e "\n\nGDM Audits:"
 banner-chk
@@ -432,4 +444,4 @@ automount-chk
 automount-override-chk
 autorun-chk 
 autorun-override-chk
-xdcmp-chk
+xdmcp-chk
