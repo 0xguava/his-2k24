@@ -1,6 +1,6 @@
 #!/bin/bash 
 
-dccp_module_audit() {
+module-chk() {
   local l_mname="$@"
   local output_p=""
   local output_f=""
@@ -51,6 +51,6 @@ dccp_module_audit() {
 
 modules=('dccp' 'ticp' 'rds' 'sccp')
 for m in "${modules[@]}";do 
-  dccp_module_audit $m
+  module-chk $m
 done
 
