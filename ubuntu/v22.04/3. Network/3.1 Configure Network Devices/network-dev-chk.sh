@@ -61,4 +61,41 @@ net-iface-chk() {
   fi
 }
 
+bluez_chk() {
+  local output_p=""
+  local output_f=""
+
+  echo -e "- Audit for checking if bluetooth services are in use:"
+  # Check if bluez package is installed
+  if dpkg-query -s bluez &>/dev/null; then
+    output_f="$output_f\n\t- bluez is installed"
+  else
+    output_p="$output_p\n\t- bluez is not installed"
+  fi
+
+  # Check if bluetooth service is enabled
+  if systemctl is-enabled bluetooth.service 2>/dev/null | grep -q 'enabled'; then
+    output_f="$output_f\n\t- bluetooth.service is enabled"
+  else
+    output_p="$output_p\n\t- bluetooth.service is not enabled"
+  fi
+
+  # Check if bluetooth service is active
+  if systemctl is-active bluetooth.service 2>/dev/null | grep -q '^active'; then
+    output_f="$output_f\n\t- bluetooth.service is active"
+  else
+    output_p="$output_p\n\t- bluetooth.service is not active"
+  fi
+
+  # Report results
+  if [ -z "$output_f" ]; then
+    echo -e "\t- Audit result [Bluez and Bluetooth Service Check]: **PASS**"
+    echo -e "$output_p"
+  else
+    echo -e "\t- Audit result [Bluez and Bluetooth Service Check]: **FAIL**"
+    echo -e "\t- Reason(s) for audit failure:\n$output_f"
+  fi
+}
+
 net-iface-chk
+bluez_chk
