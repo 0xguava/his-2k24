@@ -49,7 +49,7 @@ module-chk() {
   fi
 }
 
-modules=('dccp' 'ticp' 'rds' 'sccp')
+modules=('dccp' 'ticp' 'rds' 'sctp')
 for m in "${modules[@]}";do 
   module-chk $m
 done

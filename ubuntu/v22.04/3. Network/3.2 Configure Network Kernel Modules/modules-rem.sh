@@ -55,7 +55,7 @@ module-rem() {
   fi
 }
 
-modules=('dccp' 'ticp' 'rds' 'sccp')
+modules=('dccp' 'ticp' 'rds' 'sctp')
 for m in "${modules[@]}";do 
   module-rem $m
 done
