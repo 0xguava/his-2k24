@@ -101,6 +101,55 @@ cron-perm2-rem() {
   fi
 }
 
+at-config-rem() {
+  echo -e "- At configuration check:"
+
+  local output_p=""
+  local output_f=""
+  local l_group=""
+
+  # Check if 'at' is installed
+  if command -v at &>/dev/null; then
+    output_p+="\t- 'at' is installed\n"
+  else
+    output_f+="\t- 'at' is not installed\n"
+  fi
+
+  # Determine the group for /etc/at.allow and /etc/at.deny
+  if grep -Pq -- '^daemon\b' /etc/group; then
+    l_group="daemon"
+  else
+    l_group="root"
+  fi
+
+  # /etc/at.allow configuration
+  if [ ! -e "/etc/at.allow" ]; then
+    touch /etc/at.allow && output_p+="\t- Created /etc/at.allow\n" || output_f+="\t- Failed to create /etc/at.allow\n"
+  else
+    output_p+="\t- /etc/at.allow already exists\n"
+  fi
+
+  chown root:"$l_group" /etc/at.allow && output_p+="\t- Set ownership of /etc/at.allow to root:$l_group\n" || output_f+="\t- Failed to set ownership of /etc/at.allow\n"
+  chmod 640 /etc/at.allow && output_p+="\t- Set permissions of /etc/at.allow to 640\n" || output_f+="\t- Failed to set permissions of /etc/at.allow\n"
+
+  # /etc/at.deny configuration
+  if [ -e "/etc/at.deny" ]; then
+    chown root:"$l_group" /etc/at.deny && output_p+="\t- Set ownership of /etc/at.deny to root:$l_group\n" || output_f+="\t- Failed to set ownership of /etc/at.deny\n"
+    chmod 640 /etc/at.deny && output_p+="\t- Set permissions of /etc/at.deny to 640\n" || output_f+="\t- Failed to set permissions of /etc/at.deny\n"
+  else
+    output_p+="\t- /etc/at.deny does not exist\n"
+  fi
+
+  # Final remediation result
+  if [[ -z "$output_f" ]]; then
+    echo -e "\t- Remediation result [At Configuration Check]: **SUCCESS**"
+    echo -e "$output_p"
+  else
+    echo -e "\t- Remediation result [At Configuration Check]: **everythingisOK**"
+    echo -e "$output_f"
+  fi
+}
+
 cron-config-chk
 
 cron-rem
@@ -111,3 +160,4 @@ for c in "${crons[@]}"; do
 done
 
 cron-perm2-rem
+at-config-rem
