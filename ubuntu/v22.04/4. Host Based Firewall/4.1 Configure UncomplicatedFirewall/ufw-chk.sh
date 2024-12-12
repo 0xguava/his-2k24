@@ -49,6 +49,75 @@ enabled-chk(){
   fi
 }
 
+ufw_rules_chk() {
+  echo -e "- UFW rules check:"
+  local output_p=''
+  local output_f=''
+  local logvr=1
+
+  # Check if UFW is enabled
+  if ufw status | grep -q "Status: active"; then
+    output_p="$output_p\n\t - UFW is enabled."
+  else
+    output_f="$output_f\n\t - UFW is not enabled."
+    logvr=0
+  fi
+
+  # Check if rules are set correctly
+  local rules=$(ufw status verbose)
+  if echo "$rules" | grep -q "Anywhere on lo             ALLOW IN    Anywhere"; then
+    output_p="$output_p\n\t - Rule 1: Allow incoming traffic on loopback interface is set correctly."
+  else
+    output_f="$output_f\n\t - Rule 1: Allow incoming traffic on loopback interface is not set correctly."
+    logvr=0
+  fi
+
+  if echo "$rules" | grep -q "Anywhere                   DENY IN     127.0.0.0/8"; then
+    output_p="$output_p\n\t - Rule 2: Deny incoming traffic from 127.0.0.0/8 is set correctly."
+  else
+    output_f="$output_f\n\t - Rule 2: Deny incoming traffic from 127.0.0.0/8 is not set correctly."
+    logvr=0
+  fi
+
+  if echo "$rules" | grep -q "Anywhere (v6) on lo        ALLOW IN    Anywhere (v6)"; then
+    output_p="$output_p\n\t - Rule 3: Allow incoming traffic on loopback interface (IPv6) is set correctly."
+  else
+    output_f="$output_f\n\t - Rule 3: Allow incoming traffic on loopback interface (IPv6) is not set correctly."
+    logvr=0
+  fi
+
+  if echo "$rules" | grep -q "Anywhere (v6)              DENY IN     ::1"; then
+    output_p="$output_p\n\t - Rule 4: Deny incoming traffic from ::1 (IPv6) is set correctly."
+  else
+    output_f="$output_f\n\t - Rule 4: Deny incoming traffic from ::1 (IPv6) is not set correctly."
+    logvr=0
+  fi
+
+  if echo "$rules" | grep -q "Anywhere                   ALLOW OUT   Anywhere on lo"; then
+    output_p="$output_p\n\t - Rule 5: Allow outgoing traffic on loopback interface is set correctly."
+  else
+    output_f="$output_f\n\t - Rule 5: Allow outgoing traffic on loopback interface is not set correctly."
+    logvr=0
+  fi
+
+  if echo "$rules" | grep -q "Anywhere (v6)              ALLOW OUT   Anywhere (v6) on lo"; then
+    output_p="$output_p\n\t - Rule 6: Allow outgoing traffic on loopback interface (IPv6) is set correctly."
+  else
+    output_f="$output_f\n\t - Rule 6: Allow outgoing traffic on loopback interface (IPv6) is not set correctly."
+    logvr=0
+  fi
+
+  if [[ $logvr -eq 0 ]]; then
+    echo -e "\t- Audit result: **FAIL** [UFW rules are not set correctly]"
+    echo -e "\t- Reason: $output_f"
+  else
+    echo -e "\t- Audit result: **PASS** [UFW rules are set correctly]"
+    echo -e "\t- Reason: $output_p"
+  fi
+}
+
+
 iptables-ins-chk
 ufw-installed-chk
-enabled-chk
+enabled-chk 
+ufw_rules_chk
